@@ -1,0 +1,122 @@
+[
+  {
+    "id": "CDA",
+    "nombre": "CDA",
+    "externa": false,
+    "comision": 0.008
+  },
+  {
+    "id": "SONY",
+    "nombre": "SONY",
+    "externa": false,
+    "comision": 0.008
+  },
+  {
+    "id": "HBO",
+    "nombre": "HBO",
+    "externa": false,
+    "comision": 0.008
+  },
+  {
+    "id": "PLANTA",
+    "nombre": "PLANTA",
+    "externa": false,
+    "comision": 0.018
+  },
+  {
+    "id": "ADDI",
+    "nombre": "ADDI",
+    "externa": false,
+    "comision": 0.008
+  },
+  {
+    "id": "VELA",
+    "nombre": "VELA",
+    "externa": false,
+    "comision": 0.008
+  },
+  {
+    "id": "PERA",
+    "nombre": "PERA",
+    "externa": false,
+    "comision": 0.008
+  },
+  {
+    "id": "LUNA",
+    "nombre": "LUNA",
+    "externa": false,
+    "comision": 0.008
+  },
+  {
+    "id": "CHIMBI",
+    "nombre": "CHIMBI",
+    "externa": false,
+    "comision": 0.016
+  },
+  {
+    "id": "OPO",
+    "nombre": "OPO",
+    "externa": false,
+    "comision": 0.005
+  },
+  {
+    "id": "META",
+    "nombre": "META",
+    "externa": false,
+    "comision": 0.008
+  },
+  {
+    "id": "TESLA",
+    "nombre": "TESLA",
+    "externa": false,
+    "comision": 0.0
+  },
+  {
+    "id": "AVON",
+    "nombre": "AVON",
+    "externa": false,
+    "comision": 0.00475
+  },
+  {
+    "id": "PEZZUTY",
+    "nombre": "PEZZUTY",
+    "externa": false,
+    "comision": 0.0
+  },
+  {
+    "id": "JBL",
+    "nombre": "JBL",
+    "externa": false,
+    "comision": 0.011
+  },
+  {
+    "id": "PEPE",
+    "nombre": "PEPE",
+    "externa": false,
+    "comision": 0.0
+  },
+  {
+    "id": "SENSEI",
+    "nombre": "SENSEI",
+    "externa": false,
+    "comision": 0.0
+  },
+  {
+    "id": "MANGO",
+    "nombre": "MANGO",
+    "externa": false,
+    "comision": 0.0
+  },
+  {
+    "id": "COCACOLO",
+    "nombre": "COCACOLO",
+    "externa": false,
+    "comision": 0.035
+  },
+  {
+    "id": "FIDO",
+    "nombre": "FIDO",
+    "externa": false,
+    "comision": 0.0
+  }
+]

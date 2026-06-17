@@ -1,0 +1,32 @@
+[
+  {
+    "id": "OTC",
+    "nombre": "OTC",
+    "comision": 0.0025
+  },
+  {
+    "id": "PARE",
+    "nombre": "PARE",
+    "comision": 0.004
+  },
+  {
+    "id": "Propia",
+    "nombre": "Propia",
+    "comision": 0.0
+  },
+  {
+    "id": "N/A",
+    "nombre": "N/A",
+    "comision": 0.0
+  },
+  {
+    "id": "Sin Enviar",
+    "nombre": "Sin Enviar",
+    "comision": 0.0
+  },
+  {
+    "id": "OTC_nocom",
+    "nombre": "OTC_nocom",
+    "comision": 0.005
+  }
+]
