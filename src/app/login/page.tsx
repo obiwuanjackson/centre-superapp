@@ -16,8 +16,11 @@ export default function LoginPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ user, pass }),
     });
-    if (res.ok) router.push("/");
-    else setErr("Credenciales inválidas");
+    if (res.ok) {
+      // Full document load so the root layout re-renders server-side with the new
+      // session cookie and the sidebar shows immediately (no manual refresh needed).
+      window.location.assign("/");
+    } else setErr("Credenciales inválidas");
   }
 
   return (
