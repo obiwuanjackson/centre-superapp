@@ -7,6 +7,7 @@ export default function ClientesPage() {
       endpoint="/api/clientes"
       title="Clientes"
       idField="id"
+      idEditable
       fields={[
         { key: "id", label: "ID", required: true },
         { key: "nombre", label: "Nombre", required: true },

@@ -83,3 +83,46 @@ export async function renameClienteId(
   });
   return { updated };
 }
+
+/** Rename a payer id and cascade across operations (pagadorId). Commission snapshots on
+ * historical operations are NOT touched — only the identifier propagates. */
+export async function renamePagadorId(
+  oldId: string, newId: string, user: string
+): Promise<{ updated: number }> {
+  if (!newId || oldId === newId) return { updated: 0 };
+  const pagCol = repo().collection<Pagador>(FILES.pagadores);
+  const opsCol = repo().collection<Operacion>(FILES.operaciones);
+
+  if (await pagCol.get(newId)) throw new Error(`Payer id ${newId} already exists`);
+  const pagador = await pagCol.get(oldId);
+  if (!pagador) throw new Error("payer not found");
+
+  await pagCol.insert({ ...pagador, id: newId, nombre: pagador.nombre === oldId ? newId : pagador.nombre });
+  await pagCol.remove(oldId);
+
+  const ops = await opsCol.all();
+  let updated = 0;
+  const newOps = ops.map((o) =>
+    o.pagadorId === oldId ? (updated++, { ...o, pagadorId: newId }) : o
+  );
+  if (updated) await opsCol.replaceAll(newOps);
+
+  await audit({
+    user, module: "pagadores", action: "update", recordId: newId,
+    before: { id: oldId }, after: { id: newId, cascaded: updated },
+  });
+  return { updated };
+}
+
+/** Apply non-id field edits to a master record (e.g. nombre, externa). Commission goes
+ * through updatePagadorComision / direct update so history stays frozen. */
+export async function updateMasterFields(
+  module: string, id: string, patch: Record<string, unknown>, user: string
+) {
+  const col = repo().collection<{ id: string }>(module);
+  const before = await col.get(id);
+  if (!before) return;
+  const after = await col.update(id, patch as any);
+  await audit({ user, module, action: "update", recordId: id, before, after });
+  return after;
+}

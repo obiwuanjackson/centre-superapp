@@ -8,6 +8,7 @@ export default function PagadoresPage() {
         endpoint="/api/pagadores"
         title="Pagadores"
         idField="id"
+        idEditable
         fields={[
           { key: "id", label: "ID", required: true },
           { key: "nombre", label: "Nombre", required: true },

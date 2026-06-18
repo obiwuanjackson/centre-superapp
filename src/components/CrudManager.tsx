@@ -11,7 +11,7 @@ export interface FieldDef {
 export interface ColDef { key: string; label: string; fmt?: (v: any, row: any) => string; }
 
 export default function CrudManager({
-  endpoint, title, fields, columns, idField = "id", pageSize = 25,
+  endpoint, title, fields, columns, idField = "id", pageSize = 25, idEditable = false,
 }: {
   endpoint: string;
   title: string;
@@ -19,12 +19,15 @@ export default function CrudManager({
   columns: ColDef[];
   idField?: string;
   pageSize?: number;
+  /** when true, changing the id field issues a cascade rename across all records */
+  idEditable?: boolean;
 }) {
   const [rows, setRows] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [offset, setOffset] = useState(0);
   const [q, setQ] = useState("");
   const [form, setForm] = useState<Record<string, any>>({});
+  const [editingId, setEditingId] = useState<string | null>(null); // original id when editing
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -39,15 +42,38 @@ export default function CrudManager({
 
   useEffect(() => { load(); }, [load]);
 
-  async function add(e: React.FormEvent) {
+  function startEdit(row: any) {
+    const f: Record<string, any> = {};
+    for (const fd of fields) f[fd.key] = row[fd.key];
+    setForm(f);
+    setEditingId(row[idField]);
+    setErr("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  function cancelEdit() { setForm({}); setEditingId(null); setErr(""); }
+
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     setErr("");
+    if (editingId === null) {
+      const res = await fetch(endpoint, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form),
+      });
+      if (res.ok) { setForm({}); setOffset(0); load(); }
+      else setErr((await res.json()).error ?? "Error");
+      return;
+    }
+    // EDIT: send original id; if the id field changed and is editable, request cascade rename
+    const body: Record<string, any> = { ...form, id: editingId };
+    if (idEditable && form[idField] !== undefined && form[idField] !== editingId) {
+      body.newId = form[idField];
+      delete body.id_unused;
+      body.id = editingId;
+    }
     const res = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
     });
-    if (res.ok) { setForm({}); setOffset(0); load(); }
+    if (res.ok) { cancelEdit(); load(); }
     else setErr((await res.json()).error ?? "Error");
   }
 
@@ -65,29 +91,38 @@ export default function CrudManager({
           onChange={(e) => { setOffset(0); setQ(e.target.value); }} />
       </div>
 
-      <form onSubmit={add} className="card grid grid-cols-2 gap-3 md:grid-cols-4">
-        {fields.map((f) => (
-          <div key={f.key}>
-            <label className="label">{f.label}</label>
-            {f.type === "checkbox" ? (
-              <input type="checkbox" checked={!!form[f.key]}
-                onChange={(e) => setForm({ ...form, [f.key]: e.target.checked })} />
-            ) : f.type === "select" ? (
-              <select className="input" value={form[f.key] ?? ""}
-                onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}>
-                <option value="">—</option>
-                {f.options?.map((o) => <option key={o} value={o}>{o}</option>)}
-              </select>
-            ) : (
-              <input className="input" type={f.type ?? "text"}
-                value={form[f.key] ?? ""} required={f.required}
-                onChange={(e) =>
-                  setForm({ ...form, [f.key]: f.type === "number" ? Number(e.target.value) : e.target.value })} />
-            )}
+      <form onSubmit={submit} className={`card grid grid-cols-2 gap-3 md:grid-cols-4 ${editingId !== null ? "ring-2 ring-brand" : ""}`}>
+        {editingId !== null && (
+          <div className="col-span-2 md:col-span-4 text-sm font-medium text-brand-dark">
+            Editando: {editingId}
           </div>
-        ))}
-        <div className="col-span-2 flex items-end md:col-span-4">
-          <button className="btn">Agregar</button>
+        )}
+        {fields.map((f) => {
+          const locked = f.key === idField && !idEditable && editingId !== null;
+          return (
+            <div key={f.key}>
+              <label className="label">{f.label}{f.key === idField && idEditable && editingId !== null ? " (cambia y propaga)" : ""}</label>
+              {f.type === "checkbox" ? (
+                <input type="checkbox" checked={!!form[f.key]}
+                  onChange={(e) => setForm({ ...form, [f.key]: e.target.checked })} />
+              ) : f.type === "select" ? (
+                <select className="input" value={form[f.key] ?? ""} disabled={locked}
+                  onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}>
+                  <option value="">—</option>
+                  {f.options?.map((o) => <option key={o} value={o}>{o}</option>)}
+                </select>
+              ) : (
+                <input className="input" type={f.type ?? "text"} disabled={locked}
+                  value={form[f.key] ?? ""} required={f.required}
+                  onChange={(e) =>
+                    setForm({ ...form, [f.key]: f.type === "number" ? Number(e.target.value) : e.target.value })} />
+              )}
+            </div>
+          );
+        })}
+        <div className="col-span-2 flex items-end gap-2 md:col-span-4">
+          <button className="btn">{editingId !== null ? "Guardar cambios" : "Agregar"}</button>
+          {editingId !== null && <button type="button" className="btn-ghost" onClick={cancelEdit}>Cancelar</button>}
           {err && <span className="ml-3 text-sm text-red-600">{err}</span>}
         </div>
       </form>
@@ -104,8 +139,9 @@ export default function CrudManager({
                 {columns.map((c) => (
                   <td key={c.key} className="td">{c.fmt ? c.fmt(r[c.key], r) : String(r[c.key] ?? "")}</td>
                 ))}
-                <td className="td text-right">
-                  <button className="text-xs text-red-600 hover:underline" onClick={() => del(r[idField])}>Eliminar</button>
+                <td className="td text-right whitespace-nowrap">
+                  <button className="text-xs text-brand hover:underline" onClick={() => startEdit(r)}>Editar</button>
+                  <button className="ml-3 text-xs text-red-600 hover:underline" onClick={() => del(r[idField])}>Eliminar</button>
                 </td>
               </tr>
             ))}
