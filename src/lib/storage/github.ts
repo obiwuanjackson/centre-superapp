@@ -37,7 +37,19 @@ async function ghGet<T>(name: string, fallback: T): Promise<FileState<T>> {
   }
   if (!res.ok) throw new Error(`GitHub GET ${name}: ${res.status}`);
   const data = await res.json();
-  const decoded = Buffer.from(data.content, "base64").toString("utf8");
+  // Contents API only inlines base64 for files <1MB. For 1-100MB it returns an empty
+  // content field + a download_url; fetch that to get the body. Keeps the SHA from the
+  // metadata response so updates stay atomic.
+  let decoded: string;
+  if (data.content && data.encoding === "base64") {
+    decoded = Buffer.from(data.content, "base64").toString("utf8");
+  } else if (data.download_url) {
+    const raw = await fetch(data.download_url, { cache: "no-store" });
+    if (!raw.ok) throw new Error(`GitHub raw GET ${name}: ${raw.status}`);
+    decoded = await raw.text();
+  } else {
+    decoded = JSON.stringify(fallback);
+  }
   const st: FileState<T> = { content: JSON.parse(decoded), sha: data.sha };
   cache.set(name, st);
   return st;
