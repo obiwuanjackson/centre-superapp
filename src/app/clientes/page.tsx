@@ -1,3 +1,4 @@
+"use client";
 import CrudManager from "@/components/CrudManager";
 
 export default function ClientesPage() {

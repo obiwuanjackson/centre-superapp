@@ -1,8 +1,12 @@
+"use client";
+import { useEffect, useState } from "react";
 import CrudManager from "@/components/CrudManager";
-import { loadParams } from "@/lib/load";
+import type { Parametros } from "@/lib/types";
 
-export default async function CajaPage() {
-  const p = await loadParams();
+export default function CajaPage() {
+  const [p, setP] = useState<Parametros | null>(null);
+  useEffect(() => { fetch("/api/parametros").then((r) => r.json()).then(setP); }, []);
+  if (!p) return <div className="text-sm text-slate-400">Cargando…</div>;
   return (
     <CrudManager
       endpoint="/api/caja"

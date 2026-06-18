@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import OperacionesClient from "./OperacionesClient";
 import { loadMasters } from "@/lib/load";
 

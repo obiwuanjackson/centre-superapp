@@ -1,4 +1,5 @@
 // Dashboard (server component). KPIs computed server-side via the engine.
+export const dynamic = "force-dynamic";
 import { loadEngineInput } from "@/lib/load";
 import { summarize, loanTotals, cajaBalances, payerBalances } from "@/lib/engine";
 import { repo, FILES } from "@/lib/storage";

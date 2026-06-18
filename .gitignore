@@ -7,3 +7,6 @@ out
 .DS_Store
 .vercel
 next-env.d.ts
+# local-only secrets / deploy notes — never committed
+*.local.md
+secrets.local.*
