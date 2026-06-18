@@ -57,6 +57,11 @@ async function ghGet<T>(name: string, fallback: T): Promise<FileState<T>> {
 
 async function ghPut(name: string, value: unknown, retries = 3): Promise<void> {
   const { token, repo, branch, dir } = cfg();
+  // Ensure we know the current SHA: GitHub requires it to overwrite an existing file.
+  // On a fresh process the cache is empty, so fetch metadata first (sha=null if new).
+  if (!cache.has(name)) {
+    try { await ghGet(name, null as any); } catch { /* treat as new file */ }
+  }
   const current = cache.get(name);
   const body = {
     message: `chore(data): update ${name} @ ${new Date().toISOString()}`,

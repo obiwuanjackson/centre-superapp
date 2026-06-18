@@ -1,1 +1,18 @@
-[]
+[
+ {
+  "id": "inv_2",
+  "fecha": "2023-01-31T00:00:00",
+  "inversionUSDT": 217000.0,
+  "tasaUSDT": 4504.0,
+  "inversionCOP": 977368.0,
+  "notas": "Inversión gabacho"
+ },
+ {
+  "id": "inv_3",
+  "fecha": "2023-02-01T00:00:00",
+  "inversionUSDT": 35000.0,
+  "tasaUSDT": 4506.7,
+  "inversionCOP": 157734.5,
+  "notas": "Inversión gabacho"
+ }
+]

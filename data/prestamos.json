@@ -1,1 +1,13 @@
-[]
+[
+ {
+  "id": "pr_2",
+  "nombre": "CHIMBILINK",
+  "codigo": 0.0,
+  "tipo": "CxP",
+  "monto": 0,
+  "tasa": 36.6,
+  "fechaPago": "2026-02-09T00:00:00",
+  "detalle": "I HATE U",
+  "notas": "AT DEXTER"
+ }
+]

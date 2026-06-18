@@ -1,1 +1,9 @@
-[]
+[
+ {
+  "id": "ab_2",
+  "prestamoCodigo": 0.0,
+  "fecha": "2026-02-09T00:00:00",
+  "abono": 0,
+  "notas": "Liquidación"
+ }
+]
